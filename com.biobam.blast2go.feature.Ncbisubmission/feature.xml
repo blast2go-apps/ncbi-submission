@@ -10,7 +10,7 @@ This App allow to combine functional annotations, genome annotations (gff) with 
 The files are created with the help of the tbl2asn tool provided by the NCBI. The App eases the generation of submission files which, once validated, are readily prepared for its submission.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
+   <copyright url="https://blast2go-apps.github.io/ncbi-submission/updates">
       [Enter Copyright Description here.]
    </copyright>
 
