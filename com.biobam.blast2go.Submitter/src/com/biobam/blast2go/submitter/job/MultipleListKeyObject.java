@@ -1,4 +1,4 @@
-package com.biobam.blast2go.Submitter.job;
+package com.biobam.blast2go.submitter.job;
 import java.util.ArrayList;
 import java.util.List;
 

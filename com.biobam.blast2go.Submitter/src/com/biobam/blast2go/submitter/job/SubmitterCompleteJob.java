@@ -1,4 +1,4 @@
-package com.biobam.blast2go.Submitter.job;
+package com.biobam.blast2go.submitter.job;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,7 +24,6 @@ import org.eclipse.swt.program.Program;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.biobam.blast2go.Submitter.job.SubmitterJobParameters.SubType;
 import com.biobam.blast2go.api.datatype.basics.blast.HspKeys;
 import com.biobam.blast2go.api.datatype.basics.html.B2GHtml;
 import com.biobam.blast2go.api.datatype.basics.html.IBrowserProtocolHtmlExtension;
@@ -40,6 +39,7 @@ import com.biobam.blast2go.dag.model.IGODag;
 import com.biobam.blast2go.namedef.NameDef;
 import com.biobam.blast2go.project.model.interfaces.ILightSequence;
 import com.biobam.blast2go.project.model.interfaces.SeqCondImpl;
+import com.biobam.blast2go.submitter.job.SubmitterJobParameters.SubType;
 import com.biobam.blast2go.workbench.services.IB2GFilesDirectory;
 
 import es.blast2go.data.IB2GObjectProject;

@@ -3,7 +3,6 @@ package com.biobam.blast2go.submitter.action;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.biobam.blast2go.Submitter.job.SubmitterCompleteJobMetadata;
 import com.biobam.blast2go.api.action.ActionType;
 import com.biobam.blast2go.api.action.B2GAction;
 import com.biobam.blast2go.api.action.IB2GBaseGroup;
@@ -14,6 +13,7 @@ import com.biobam.blast2go.api.action.internal.IB2GPermissionHandler;
 import com.biobam.blast2go.api.user.IUserInfoConstants;
 import com.biobam.blast2go.api.user.Profile;
 import com.biobam.blast2go.api.wizard.B2GWizard;
+import com.biobam.blast2go.submitter.job.SubmitterCompleteJobMetadata;
 import com.biobam.blast2go.submitter.wizard.SubmitterCompleteWizard;
 
 public class SubmitterActionCompleteGenome extends B2GAction<SubmitterCompleteJobMetadata>

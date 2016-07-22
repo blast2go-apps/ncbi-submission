@@ -1,4 +1,4 @@
-package com.biobam.blast2go.Submitter.job;
+package com.biobam.blast2go.submitter.job;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;

@@ -13,14 +13,14 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import com.biobam.blast2go.Submitter.job.AuthorEntry;
-import com.biobam.blast2go.Submitter.job.AuthorsTable;
-import com.biobam.blast2go.Submitter.job.ListKeyObject;
-import com.biobam.blast2go.Submitter.job.SubmitterJobParameters;
 import com.biobam.blast2go.api.wizard.page.B2GWizardPage;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.NoteWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.StringWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.TextWidget;
+import com.biobam.blast2go.submitter.job.AuthorEntry;
+import com.biobam.blast2go.submitter.job.AuthorsTable;
+import com.biobam.blast2go.submitter.job.ListKeyObject;
+import com.biobam.blast2go.submitter.job.SubmitterJobParameters;
 
 public class ThirdPage extends B2GWizardPage implements IWizardPage {
 

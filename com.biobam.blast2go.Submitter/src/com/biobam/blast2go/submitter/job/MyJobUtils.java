@@ -1,4 +1,4 @@
-package com.biobam.blast2go.Submitter.job;
+package com.biobam.blast2go.submitter.job;
 
 import java.io.BufferedReader;
 import java.io.File;

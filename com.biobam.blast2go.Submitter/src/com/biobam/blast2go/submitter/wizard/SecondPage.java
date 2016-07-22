@@ -6,8 +6,6 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.widgets.Composite;
 
-import com.biobam.blast2go.Submitter.job.SubmitterJobParameters;
-import com.biobam.blast2go.Submitter.job.SubmitterJobParameters.GeneName;
 import com.biobam.blast2go.api.wizard.page.B2GWizardPage;
 import com.biobam.blast2go.api.wizard.page.widget.IB2GWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.B2GGroup;
@@ -17,6 +15,8 @@ import com.biobam.blast2go.api.wizard.page.widget.implementations.FileWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.NoteWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.SpaceWidget;
 import com.biobam.blast2go.api.wizard.page.widget.implementations.StringWidget;
+import com.biobam.blast2go.submitter.job.SubmitterJobParameters;
+import com.biobam.blast2go.submitter.job.SubmitterJobParameters.GeneName;
 
 public class SecondPage extends B2GWizardPage implements IWizardPage {
 

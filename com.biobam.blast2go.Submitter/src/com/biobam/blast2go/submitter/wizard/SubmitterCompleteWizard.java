@@ -1,7 +1,7 @@
 package com.biobam.blast2go.submitter.wizard;
 
-import com.biobam.blast2go.Submitter.job.SubmitterJobParameters;
 import com.biobam.blast2go.api.wizard.B2GWizard;
+import com.biobam.blast2go.submitter.job.SubmitterJobParameters;
 
 public class SubmitterCompleteWizard extends B2GWizard<SubmitterJobParameters> {
 	public SubmitterCompleteWizard() {
