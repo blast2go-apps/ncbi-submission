@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html >
+ <style type = "text/css">
+              body {font-size: 12px; color: black; font-family: arial; background-color: #e9edf5;}
+              a {text-decoration: none;}
+              table.horizontal {font-size: 12px; width='100%'; border: 1px; background-color: #bfc8cc;}
+              th.horizontal {background-color: #bfc8cc;}
+              td.horizontal {background-color: #ffffff;}
+              table.vertical {font-size: 12px; width='100%'; cellspacing='1'; cellpadding='3'; background-color: #bfc8cc;}
+              th.vertical {color:black; background-color: #bfc8cc;}
+              tr.vertical {background-color: #ffffff;}
+              td.over {background-color: #ffa0ab;}
+              td.under {background-color: #a6e5c0;}
+              p.columns{-webkit-columns: 100px 4; -webkit-display:table-caption; columns: 100px 3;}
+              </style>
+<body>
+
+
+<head>
+<font size="4"><b>
+GenBank Submission File Creation: Result summary</b></font></head>
+<p>
+Project name: $PROJECT$ <br>
+Created files can be found here: <i>$pathtofiles$</i><br>
+Number of annotated sequences: $ANNOTATED_SEQ$<br>
+Number of sequences not processed: $NUM_NOT_ANNOTATED$
+</p>
+<br>
+<table id= "mytable",
+font-size: 12px; width='90%'; cellspacing='2'; cellpadding='3'; background-color: #bfc8cc;
+align= center>
+<tr class= "vertical">
+    <th class= "horizontal">Extension file</th>
+    <th class= "horizontal">Content</th>
+
+<tr class= "vertical">
+    <td class= "horizontal", align= center> $FILENAME$.sqn</td>
+    <td class="horizontal">This is the ASN1 file that contains the compressed
+information of the .tbl and .sbt files.</td>
+
+  </tr>
+  <tr class= "vertical">
+    <td class= "horizontal", align= center> $FILENAME$.tbl</td>
+    <td class="horizontal">The file containing the coordinates and features
+for each annotated gene.</td>
+
+  </tr>
+  <tr class= "vertical">
+    <td class= "horizontal", align= center> $FILENAME$.sbt</td>
+    <td class="horizontal">The file containing the authors and project information.</td>
+
+  <tr class= "vertical">
+    <td class= "horizontal", align= center> $FILENAME$.gbf</td>
+    <td class="horizontal">This is the flatfile, a previous view of the .sqn once it is published. </td>
+
+  </tr>
+  <tr class= "vertical">
+    <td class= "horizontal", align= center> $FILENAME$.ecn</td>
+    <td class="horizontal">This file contains the Enzyme Consortium Number errors and the changes
+applied by  the NCBI automatic validation you have just performed. </td>
+
+  </tr>
+
+  <tr>
+    <td class= "horizontal", align= center> $FILENAME$.val</td>
+    <td class="horizontal">This is the same file as the "errorsummary.val", with more details and explanations, that will guide you to do the appropriate corrections.
+    </td>
+  </tr>
+  <tr>
+    <td class= "horizontal", align= center> Discrepancies.txt</td>
+    <td class="horizontal"> This file contains additional information about the errors found.</td>
+  </tr>
+</table>
+<p>The results of the validation is shown below:</p>
+<pre>
+$errorsummary$
+</pre>
+
+<ul>
+<li>'<b>Error</b>' must be fixed.  Details can be found in the file '.val' .</li>
+<li>The '<b> Warning</b>' messages should be reviewed and might be correct, depending on your data.
+Please <b>check and correct</b> the requested changes in the .gff file and the Blast2GO annotations. <b>Rerun</b> the submission tool until the data is fully validated.<br></li>
+
+<li>
+The ASN1 (.sqn) file is now <b>ready for submission</b> via the <a href="$URL$">$WEBNAME$</a>.
+<br>
+Please, <b>send an email</b> to the Submission Processing Center (genomes@ncbi.nlm.nih.gov) whenever you submit a new genome, and include the
+registered BioProject and organism name in the message and the requested release date of the genome
+(the choices are ‘immediately after processing’ or a specific date).</li>
+    <br>
+<li>
+If either the Discrepancy Report or the Genome Submissions Check tool report errors that you feel are
+not problems, please include the list of these errors along with some explanation as to why they are OK.
+Once they receive your genome submission, a member of their staff will conduct an initial review of it
+and will contact you by email.</li>
+</ul>
+
+
+
+<p class="columns">$NOT_ANNOTATED$</p>
+
+
+</body>
+</html>
