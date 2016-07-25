@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.biobam.blast2go.apps.submitter.feature"
+      label="Create GenBank Submission Files"
+      version="1.0.1.qualifier"
+      provider-name="BIOBAM">
+
+   <description>
+      This App automatizes the creation of the .sqn file for the NCBI submission.
+This App allow to combine functional annotations, genome annotations (gff) with its genomics sequence data for directly submission to the NCBI GenBank.
+The files are created with the help of the tbl2asn tool provided by the NCBI. The App eases the generation of submission files which, once validated, are readily prepared for its submission.
+   </description>
+
+   <copyright url="https://blast2go-apps.github.io/ncbi-submission/updates">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="https://www.biobam.com/biobam-legal">
+      This App is provided under the terms and conditions of the Blast2GO software. These terms as well as the corresponding Blast2GO End User License Agreement (EULA) are provided online at: https://www.biobam.com/biobam-legal.
+   </license>
+
+   <plugin
+         id="com.biobam.blast2go.apps.submitter"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

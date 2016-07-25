@@ -1,14 +1,4 @@
-*target*
-com.biobam.blast2go.Submitter/bin/
-# eclipse specific git ignore
-*.pydevproject
-.metadata
-*.tmp
-*.bak
-*.swp
-*~.nib
-.classpath
-.settings/
-.loadpath
-
+target/
+/target/
+*.class
 
