@@ -1,0 +1,21 @@
+\ProvidesPackage{title_page_def}[2008/11/23]
+\RequirePackage{graphicx}
+
+\ProcessOptions
+\renewcommand{\maketitle}{
+\thispagestyle{empty}
+\begin{center}
+\vspace*{4cm}
+{\sffamily\Huge \@title}\\
+\vspace{2cm}
+{\rmfamily\Large \@author}\\
+{\rmfamily \@date}\\
+\vspace{3cm}
+\includegraphics[width=10cm]{img/b2g_logo_default.png}\\
+\vspace{3cm}
+{\rmfamily BioBam Bioinformatics S.L.}\\
+{\rmfamily Valencia, Spain}\\
+\end{center}
+\cleardoublepage
+\setcounter{page}{1}
+}
