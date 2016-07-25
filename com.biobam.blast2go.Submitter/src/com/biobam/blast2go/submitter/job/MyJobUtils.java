@@ -393,6 +393,7 @@ public class MyJobUtils {
 
 				process.execute();
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 				return;
 			}
 		} catch (Exception e) {
@@ -452,6 +453,8 @@ public class MyJobUtils {
 		}
 
 	};
+
+
 
 	static B2GHtml summary(SubmitterJobParameters parameters, ReturnIDs Ids, String projectName)
 			throws FileNotFoundException, IOException {
@@ -537,7 +540,6 @@ public class MyJobUtils {
 
 					@Override
 					public boolean canDo(String arg0) {
-						// wololo
 						return true;
 					}
 				});

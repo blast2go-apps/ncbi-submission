@@ -24,4 +24,3 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: commons-lang3-3.4-javadoc.jar,
  commons-lang3-3.4.jar,
  .
-Export-Package: com.biobam.blast2go.submitter.job

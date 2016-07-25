@@ -20,13 +20,11 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.swt.program.Program;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.biobam.blast2go.api.datatype.basics.blast.HspKeys;
 import com.biobam.blast2go.api.datatype.basics.html.B2GHtml;
-import com.biobam.blast2go.api.datatype.basics.html.IBrowserProtocolHtmlExtension;
 import com.biobam.blast2go.api.datatype.basics.mapping.GoMapping;
 import com.biobam.blast2go.api.datatype.basics.mapping.GoMappingKeys;
 import com.biobam.blast2go.api.datatype.basics.mapping.GoMappings;
@@ -65,18 +63,23 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		String b2gFilePath = b2gFilesDirectory.getPath();
 
 		try {
+			IProject project = getInput(SubmitterCompleteJobMetadata.INPUT_PROJECT);
+			beginTask("NCBI submission",project.getSelectedSequencesCount() + 4);
 
-			beginTask("NCBI submission", 3);
+
 			MyJobUtils.sbtParser(parameters,monitor);
+			worked(1);
 			if (isCanceled()) {
 				return;
 			}
-			worked(1);
+
 			// Check for gff files
 			MyJobUtils.existingFilesAndFolders(parameters, monitor);
 
 			if (parameters.subType.getValue().equals(SubType.wgs) && !isCanceled()){
 				MyJobUtils.cmtParser(parameters, monitor);
+				worked(1);
+
 			}
 
 			if (isCanceled()) {
@@ -87,10 +90,11 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			if (isCanceled()) {
 				return;
 			}
-			worked(1);
+
 			String b2gSubmitterExecutable = DownloadBinaries.download(b2gFilePath);
 			MyJobUtils.tbl2asn(parameters, b2gSubmitterExecutable,monitor);
 			//tbl2asn(parameters, b2gSubmitterExecutable);
+			worked(1);
 			if (isCanceled()) {
 				return;
 			}
@@ -136,9 +140,11 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		File newFastaFile = new File(newFasta);
 		Files.copy(originFasta.toPath(), newFastaFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
+		String geneName = "hypothetical protein";//--------THIS
+		String productName = geneName;
 		while (iterator.hasNext() && !isCanceled()) {
+			//---------------------------------------------WAS HERE
 			ILightSequence sequence = iterator.next();
-			String geneName = "hypothetical protein";
 			if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT, SeqCondImpl.COND_HAS_MAPPING_RESULT,
 					SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
 				Double seqEval = sequence.getBlastOutput().getTopHit().getTopHsp().get(HspKeys.EVALUE);
@@ -150,11 +156,20 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 						&& (seqSim.compareTo(parameters.sim.getValue()) >= 0)) {
 //					Obtain the geneName from NCBI datbase
 					Object geneID = sequence.getBlastOutput().getTopHit().getGis();
-					String WebgeneName = RetrieveGeneFromNCBI.getNames(geneID);
-					System.out.println(WebgeneName);
-					geneName = WebgeneName;
-//					geneName = getGeneName(
-//							sequence.getGoMappings().getGoMappings((sequence.getBlastOutput().getTopHit())));
+					String GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
+					System.out.println(GeneProd);
+					String[] name = GeneProd.split("\\$");
+					String ncbiGeneName =  name[0];
+					String ncbiProdName =  name[1];
+					if (ncbiGeneName != "" && ncbiGeneName != "hypothetical protein") {
+
+						geneName = ncbiGeneName;
+						productName = ncbiProdName;
+
+					}else{
+					geneName = getGeneName(
+							sequence.getGoMappings().getGoMappings((sequence.getBlastOutput().getTopHit())));
+						}
 					if (sequence.hasConditions(SeqCondImpl.COND_HAS_MANUAL_ANNOT_RESULT)) {
 						geneName = sequence.getDescription();
 
@@ -191,7 +206,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 						ecCodes);
 				annotations.add(annotation);
 			}
-
+			worked(1);
 		}
 
 		IGODag goDag = getInput(SubmitterCompleteJobMetadata.GO_DAG);
@@ -280,7 +295,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 						bw.newLine();
 					}
 				}
-				bw.write(TAB_3 + "product" + TAB + geneNAME);
+				bw.write(TAB_3 + "product" + TAB + productName);
 				bw.newLine();
 				bw.write(TAB_3 + "protein_id" + TAB + "gln|" + parameters.labID.getValue() + "|" + locusTag);
 				bw.newLine();
@@ -458,21 +473,23 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 			}
 		}
-		return B2GHtml.newInstance("GenBank Submission File Creation Results", errorSummary.toString(),
-				new IBrowserProtocolHtmlExtension() {
+		return B2GHtml.newInstance("GenBank Submission File Creation Results", errorSummary.toString()
 
-					@Override
-					public B2GHtml treat(String arg0) {
-						Program.launch(arg0);
-						return null;
-					}
-
-					@Override
-					public boolean canDo(String arg0) {
-						// wololo
-						return true;
-					}
-				});
+//				new IBrowserProtocolHtmlExtension() {
+//
+//					@Override
+//					public B2GHtml treat(String arg0) {
+//						Program.launch(arg0);
+//						return null;
+//					}
+//
+//					@Override
+//					public boolean canDo(String arg0) {
+//						// wololo
+//						return true;
+//					}
+//				}
+			);
 
 	}
 

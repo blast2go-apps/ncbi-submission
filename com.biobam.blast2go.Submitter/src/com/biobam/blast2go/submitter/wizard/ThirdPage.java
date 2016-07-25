@@ -59,10 +59,10 @@ public class ThirdPage extends B2GWizardPage implements IWizardPage {
 			AuthorEntry author = (AuthorEntry) option;
 			authors.add(author);
 		}
-		if (authors.isEmpty()) {
-			authors.add(new AuthorEntry(parameters.authorFNameC.getValue(), parameters.initialsC.getValue(),
-					parameters.authorLNameC.getValue()));
-		}
+//		if (authors.isEmpty()) {
+//			authors.add(new AuthorEntry(parameters.authorFNameC.getValue(), parameters.initialsC.getValue(),
+//					parameters.authorLNameC.getValue()));
+//		}
 		authorsWidget.setInput(authors);
 
 
