@@ -37,7 +37,7 @@ public class RetrieveGeneFromNCBI {
 			OutputStream os = null;
 			OutputStreamWriter writer = null;
 
-			boolean success = false;
+//			boolean success = false;
 
 			connection = (HttpURLConnection) ConnectionUtilities.getUrlConnection(ncbi_url);
 			connection.setConnectTimeout(
@@ -51,9 +51,10 @@ public class RetrieveGeneFromNCBI {
 			writer.write("db=protein&id=" + geneID + "&rettype=gb&retmode=xml");
 			writer.flush();
 			final int statusCode = connection.getResponseCode();
+			System.out.println(statusCode);
 			//if (statusCode != 200){
 
-			success = true;
+//			success = true;
 			InputStream in = connection.getInputStream();
 //			String decoded = Utilities.convertStreamToString(in);
 //			System.out.println(decoded);

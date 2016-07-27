@@ -20,6 +20,8 @@ import java.util.Vector;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.osgi.framework.Bundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +66,9 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 		try {
 			IProject project = getInput(SubmitterCompleteJobMetadata.INPUT_PROJECT);
-			beginTask("NCBI submission",project.getSelectedSequencesCount() + 4);
+			beginTask("NCBI submission", project.getSelectedSequencesCount() + 4);
 
-
-			MyJobUtils.sbtParser(parameters,monitor);
+			MyJobUtils.sbtParser(parameters, monitor);
 			worked(1);
 			if (isCanceled()) {
 				return;
@@ -76,7 +77,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			// Check for gff files
 			MyJobUtils.existingFilesAndFolders(parameters, monitor);
 
-			if (parameters.subType.getValue().equals(SubType.wgs) && !isCanceled()){
+			if (parameters.subType.getValue().equals(SubType.wgs) && !isCanceled()) {
 				MyJobUtils.cmtParser(parameters, monitor);
 				worked(1);
 
@@ -92,8 +93,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			}
 
 			String b2gSubmitterExecutable = DownloadBinaries.download(b2gFilePath);
-			MyJobUtils.tbl2asn(parameters, b2gSubmitterExecutable,monitor);
-			//tbl2asn(parameters, b2gSubmitterExecutable);
+			MyJobUtils.tbl2asn(parameters, b2gSubmitterExecutable, monitor);
+			// tbl2asn(parameters, b2gSubmitterExecutable);
 			worked(1);
 			if (isCanceled()) {
 				return;
@@ -108,20 +109,22 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 		}
 	}
+
 	public class ReturnIDs {
-	    public final List<String> a;
-	    public final Integer b;
+		public final List<String> a;
+		public final Integer b;
 
-	    public ReturnIDs(List<String> a, Integer b) {
-	        this.a = a;
-	        this.b = b;
+		public ReturnIDs(List<String> a, Integer b) {
+			this.a = a;
+			this.b = b;
 
-	    }
+		}
 
-	    public List<String> getIDsNotFound() {
+		public List<String> getIDsNotFound() {
 			return a;
 		}
-	    public Integer getNumberIDsFound() {
+
+		public Integer getNumberIDsFound() {
 			return b;
 		}
 
@@ -140,10 +143,9 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		File newFastaFile = new File(newFasta);
 		Files.copy(originFasta.toPath(), newFastaFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-		String geneName = "hypothetical protein";//--------THIS
-		String productName = geneName;
 		while (iterator.hasNext() && !isCanceled()) {
-			//---------------------------------------------WAS HERE
+			String geneName = "hypothetical protein";
+			String productName = geneName;
 			ILightSequence sequence = iterator.next();
 			if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT, SeqCondImpl.COND_HAS_MAPPING_RESULT,
 					SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
@@ -154,22 +156,24 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 				if ((seqEval.compareTo(eValue) <= 0) && (seqCov.compareTo(parameters.coverage.getValue()) >= 0)
 						&& (seqSim.compareTo(parameters.sim.getValue()) >= 0)) {
-//					Obtain the geneName from NCBI datbase
+					// Obtain the geneName from NCBI datbase
 					Object geneID = sequence.getBlastOutput().getTopHit().getGis();
+					System.out.println(geneID);
 					String GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
 					System.out.println(GeneProd);
-					String[] name = GeneProd.split("\\$");
-					String ncbiGeneName =  name[0];
-					String ncbiProdName =  name[1];
-					if (ncbiGeneName != "" && ncbiGeneName != "hypothetical protein") {
 
-						geneName = ncbiGeneName;
-						productName = ncbiProdName;
+					// String[] name = GeneProd.split("\\$");
+					// String ncbiGeneName = name[0];
+					// String ncbiProdName = name[1];
+					if (GeneProd != "" && GeneProd != "hypothetical protein" && GeneProd != "$") {
+						geneName = GeneProd;
+						// geneName = ncbiGeneName;
+						// productName = ncbiProdName;
 
-					}else{
-					geneName = getGeneName(
-							sequence.getGoMappings().getGoMappings((sequence.getBlastOutput().getTopHit())));
-						}
+					} else {
+						geneName = getGeneName(
+								sequence.getGoMappings().getGoMappings((sequence.getBlastOutput().getTopHit())));
+					}
 					if (sequence.hasConditions(SeqCondImpl.COND_HAS_MANUAL_ANNOT_RESULT)) {
 						geneName = sequence.getDescription();
 
@@ -255,21 +259,34 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 
 				String geneNAME = null;
-
+				String productName = null;
 				switch (parameters.geneName.getValue()) {
 				case Hypothetical_protein:
 					geneNAME = "hypothetical protein";
+					productName = geneNAME;
 					break;
 				case Top_Blast_Hit:
-					geneNAME = annotation.geneName;
+					String[] names = annotation.geneName.split("\\$");
+					if (names.length < 2) {
+						geneNAME = names[0];
+						productName = geneNAME;
+					}else{
+					geneNAME = names[0];
+					productName = names[1];
+					}
+					if (geneNAME.equals("")){geneNAME = "hypothetical protein";}
+					if (productName.equals("")){productName = "hypothetical protein";}
+					// geneNAME = annotation.geneName;
+
 					break;
 				case SeqName:
 					geneNAME = annotation.name;
+					productName = geneNAME;
 					break;
 				default:
 					break;
 				}
-				//bw.newLine();
+				// bw.newLine();
 				bw.write(TAB_3 + "gene" + TAB + geneNAME);
 				bw.newLine();
 				if (gene.isReverseStrand) {
@@ -279,7 +296,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					bw.write(gene.mRnaCoordenates.start + TAB + gene.mRnaCoordenates.end + TAB + "mRNA");
 					bw.newLine();
 				}
-				bw.write(TAB_3 + "product" + TAB + geneNAME);
+				bw.write(TAB_3 + "product" + TAB + productName);
 				bw.newLine();
 				if (gene.isReverseStrand) {
 					for (int i = gene.cdss.size() - 1; i >= 0; i--) {
@@ -344,7 +361,6 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		return new ReturnIDs(missingIds, geneCounter);
 	}
 
-
 	private static List<String> getSequenceAnnotationGos(ILightSequence sequence) {
 		if (!sequence.hasConditions(SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
 			return Collections.emptyList();
@@ -402,6 +418,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			final String PROJECT = "$PROJECT$";
 			final String FILENAME = "$FILENAME$";
 			final String PATH = "$pathtofiles$";
+			final String IMAGE = "$IMAGE$";
 			final String ANNOTATED_SEQ = "$ANNOTATED_SEQ$";
 			final String ERRORS = "$errorsummary$";
 			final String NUM_NOT_ANNOTATED = "$NUM_NOT_ANNOTATED$";
@@ -419,28 +436,35 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				if (line.contains(FILENAME)) {
 					line = line.replace(FILENAME, tblName);
 				}
+				if (line.contains(IMAGE)) {
+					final Bundle bundle = Platform.getBundle("com.biobam.blast2go.apps.submitter");
+					java.net.URL entry = bundle.getEntry("/res/ncbi-logo.png");
+
+					String ncbiImg = FileUtils.imageToDataURI(entry);
+					line = line.replace(IMAGE, "\""+ncbiImg+"\"");
+				}
 				if (line.contains(ANNOTATED_SEQ)) {
 					line = line.replace(ANNOTATED_SEQ, Ids.getNumberIDsFound().toString());
 				}
 				if (line.contains(NUM_NOT_ANNOTATED)) {
 					line = line.replace(NUM_NOT_ANNOTATED, Integer.toString(Ids.getIDsNotFound().size()));
 				}
-				if(line.contains(URL)){
+				if (line.contains(URL)) {
 					String url = null;
 					String webName = null;
 					switch (parameters.subType.getValue().getId()) {
 					case "wgs":
-						 url = "https://submit.ncbi.nlm.nih.gov/subs/wgs/";
-						 webName = "WGS Submission Portal";
+						url = "https://submit.ncbi.nlm.nih.gov/subs/wgs/";
+						webName = "WGS Submission Portal";
 
 						break;
 					case "single":
-						 url = "http://www.ncbi.nlm.nih.gov/LargeDirSubs/dir_submit.cgi";
-						 webName = "SequinMacroSend";
+						url = "http://www.ncbi.nlm.nih.gov/LargeDirSubs/dir_submit.cgi";
+						webName = "SequinMacroSend";
 						break;
 					case "genome":
-						 url = "http://www.ncbi.nlm.nih.gov/projects/GenomeSubmit/genome_submit.cgi";
-						 webName = "GenomesMacroSend Direct Submission Tool for Genomes Files";
+						url = "http://www.ncbi.nlm.nih.gov/projects/GenomeSubmit/genome_submit.cgi";
+						webName = "GenomesMacroSend Direct Submission Tool for Genomes Files";
 						break;
 
 					default:
@@ -454,15 +478,15 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					for (String id : Ids.getIDsNotFound()) {
 						IDsNotFound.append(id + "<br>");
 					}
-					if(Ids.getIDsNotFound().size()>0){
+					if (Ids.getIDsNotFound().size() > 0) {
 						errorSummary.append("<p><u>Sequences not processed:</u> <br></p>");
 					}
 					line = line.replace(NOT_ANNOTATED, IDsNotFound);
 				}
-				if (Ids.getNumberIDsFound()==0){
+				if (Ids.getNumberIDsFound() == 0) {
 					line = line.replace(ERRORS, "<b>ERROR:</b> No sequences have been processed.");
 					errorSummary.append(line + "\n");
-				}else if (line.contains(ERRORS) && (sqnFile.length() > 0)) {
+				} else if (line.contains(ERRORS) && (sqnFile.length() > 0)) {
 					line = line.replace(ERRORS, onlyErrors);
 					errorSummary.append(line + "\n");
 				} else {
@@ -475,21 +499,21 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		}
 		return B2GHtml.newInstance("GenBank Submission File Creation Results", errorSummary.toString()
 
-//				new IBrowserProtocolHtmlExtension() {
-//
-//					@Override
-//					public B2GHtml treat(String arg0) {
-//						Program.launch(arg0);
-//						return null;
-//					}
-//
-//					@Override
-//					public boolean canDo(String arg0) {
-//						// wololo
-//						return true;
-//					}
-//				}
-			);
+		// new IBrowserProtocolHtmlExtension() {
+		//
+		// @Override
+		// public B2GHtml treat(String arg0) {
+		// Program.launch(arg0);
+		// return null;
+		// }
+		//
+		// @Override
+		// public boolean canDo(String arg0) {
+		// // wololo
+		// return true;
+		// }
+		// }
+		);
 
 	}
 
@@ -567,7 +591,6 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		return features;
 	}
 
-
 	private String getDomain(GONode goNode) {
 		switch (goNode.getNamespace()) {
 		case BIOLOGICAL_PROCESS:
@@ -639,6 +662,5 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		}
 
 	}
-
 
 }
