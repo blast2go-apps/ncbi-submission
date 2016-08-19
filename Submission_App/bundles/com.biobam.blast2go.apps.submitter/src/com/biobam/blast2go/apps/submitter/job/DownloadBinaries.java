@@ -37,7 +37,6 @@ public class DownloadBinaries {
 		}
 
 		File tempFile;
-		// YO SOLITO :C
 		if (OSValidator.isWindows()) {
 			byte[] buffer = new byte[1024];
 			File directory = executable.getParentFile();

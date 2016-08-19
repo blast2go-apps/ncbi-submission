@@ -223,7 +223,7 @@ public class SubmitterJobParameters extends Parameters {
 							+ "Plus the fasta file, the feature file and the authors information must be in the same folder. The working directory will be the same of the fasta file.")
 			.build();
 
-	public FileKey outputDir = FileKey.builder(getBaseName(".outputDir")).setName("Set the output direcftory")
+	public FileKey outputDir = FileKey.builder(getBaseName(".outputDir")).setName("Set the output directory")
 			.setValidator(PathValidator.existingFolder()).build();
 
 	public FileKey fastatFile = FileKey.builder(getBaseName(".fastatFile")).setName("Reference genome (fasta file)")
@@ -442,24 +442,17 @@ public class SubmitterJobParameters extends Parameters {
 			.setValidator(StringValidator.notEmptyString()).build();
 
 	public StringKey genomeCoverage = StringKey.builder(getBaseName(".genomeCoverage"), "").setName("Genome coverage")
-			.setDescription("The coverage of your genome").setMessage("eg: 12x, 76x, ...")
+			.setDescription("The coverage of your genome.").setMessage("eg: 12x, 76x, ...")
 			.setValidator(StringValidator.create("[0-9]{1,3}x$", "Bad format coverage, please write it as 76x.")).build();
-
-//	public ComplexListKey<String> technology = ComplexListKey.builder(getBaseName(".technology"), String.class, Arrays.asList("ABI3730", "Sanger", "454", "Illumina", "Illumina GAII", "Illumina GAIIx",
-//			"Illumina HiSeq", "Illumina MiSeq", "Illumina NextSeq", "Illumina NextSeq 500", "SOLiD",
-//			"PacBio", "IonTorrent", "Helicos", "CompleteGenomics"), "Illumina HiSeq")
-//		    .setStringToElementCallBack(ElementFromStringGenerator.STRING_TO_STRING)
-//		    .setName("")
-//		    .build();
 
 	public ComplexListKey<String> technology =  (ComplexListKey<String>) ComplexListKey
 			.builder(getBaseName(".technology"), String.class,
 					Arrays.asList("ABI3730", "Sanger", "454", "Illumina", "Illumina GAII", "Illumina GAIIx",
 							"Illumina HiSeq", "Illumina MiSeq", "Illumina NextSeq", "Illumina NextSeq 500", "SOLiD",
-							"PacBio", "IonTorrent", "Helicos", "CompleteGenomics", "\"Tap to writte\""),
+							"PacBio", "IonTorrent", "Helicos", "CompleteGenomics", "Other (write here)"),
 					"Illumina HiSeq")
 			.setStringToElementCallBack(ElementFromStringGenerator.STRING_TO_STRING)
-			.setDescription("The technology used to perform the assembly. You can type another one if it's not on the list.")
+			.setDescription("The technology used to perform the assembly. You can type another one if it is not in the list.")
 			.setName("Sequencing technology")
 			.build();
 

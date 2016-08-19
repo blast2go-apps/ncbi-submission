@@ -53,26 +53,26 @@ public class SecondPage extends B2GWizardPage implements IWizardPage {
 		IB2GWidget eval = addWidget(StringWidget.create(compositeGroup3, parameters.eVal));
 		IB2GWidget sim = addWidget(DoubleWidget.create(compositeGroup3, parameters.sim));
 		IB2GWidget coverage = addWidget(DoubleWidget.create(compositeGroup3, parameters.coverage));
-		enhabler(eval, sim, coverage);
+//		enhabler(eval, sim, coverage);
 
-		parameters.geneName.addPropertyChangeListener("value", new PropertyChangeListener() {
-
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				enhabler(eval, sim, coverage);
-			}
-		});
-	}
-
-	private void enhabler(IB2GWidget eval, IB2GWidget sim, IB2GWidget coverage) {
-		if (parameters.geneName.getValue() == GeneName.Top_Blast_Hit) {
-			eval.setEnabled(true);
-			sim.setEnabled(true);
-			coverage.setEnabled(true);
-		} else {
-			eval.setEnabled(false);
-			sim.setEnabled(false);
-			coverage.setEnabled(false);
-		}
+//		parameters.geneName.addPropertyChangeListener("value", new PropertyChangeListener() {
+//
+//			@Override
+//			public void propertyChange(PropertyChangeEvent evt) {
+//				enhabler(eval, sim, coverage);
+//			}
+//		});
+//	}
+//
+//	private void enhabler(IB2GWidget eval, IB2GWidget sim, IB2GWidget coverage) {
+//		if (parameters.geneName.getValue() == GeneName.Top_Blast_Hit) {
+//			eval.setEnabled(true);
+//			sim.setEnabled(true);
+//			coverage.setEnabled(true);
+//		} else {
+//			eval.setEnabled(false);
+//			sim.setEnabled(false);
+//			coverage.setEnabled(false);
+//		}
 	}
 }
