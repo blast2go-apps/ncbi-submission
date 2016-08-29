@@ -3,12 +3,18 @@
       id="com.biobam.blast2go.apps.submitter.feature"
       label="Create GenBank Submission Files"
       version="1.0.3.qualifier"
-      provider-name="BIOBAM">
+      provider-name="BIOBAM"
+      os="linux,macosx,win32"
+      nl="en_GB,en_US">
 
    <description>
-      This App automatizes the creation of the .sqn file for the NCBI submission.
-This App allow to combine functional annotations, genome annotations (gff) with its genomics sequence data for directly submission to the NCBI GenBank.
-The files are created with the help of the tbl2asn tool provided by the NCBI. The App eases the generation of submission files which, once validated, are readily prepared for its submission.
+      This App automatizes the creation of the .sqn file for the NCBI
+submission.
+This App allow to combine functional annotations, genome annotations
+(gff) with its genomics sequence data for directly submit them
+to the NCBI GenBank.
+The files are created with the help of the tbl2asn tool provided
+by the NCBI.
    </description>
 
    <copyright url="https://blast2go-apps.github.io/ncbi-submission/updates">
