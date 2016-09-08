@@ -31,7 +31,7 @@ public class SubmitterActionCompleteGenome extends B2GAction<SubmitterCompleteJo
 	public IB2GIcon getActionIcon() {
 
 		// TODO Auto-generated method stub
-        return DefaultB2GIcons.PRO_ICON;	}
+        return IB2GIcon.NO_ICON;	}
 
 	@Override
 	public ActionType getActionType() {
@@ -77,7 +77,7 @@ public class SubmitterActionCompleteGenome extends B2GAction<SubmitterCompleteJo
 
 	@Override
 	public EnumSet<Profile> executionPermissions() {
-		return IUserInfoConstants.PRO_USERS_GROUP;
+		return IUserInfoConstants.ALL_USERS_GROUP;
 	}
 
 }
