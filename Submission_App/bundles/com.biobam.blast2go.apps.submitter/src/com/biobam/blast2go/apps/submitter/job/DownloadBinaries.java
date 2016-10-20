@@ -78,7 +78,6 @@ public class DownloadBinaries {
 				executable.setExecutable(true);
 				tempFile.delete();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

@@ -254,7 +254,7 @@ public class SubmitterJobParameters extends Parameters {
 
 	public StringKey tagName = StringKey.builder(getBaseName(".tagname"), "seqName").setName("Feature ID of annotation")
 			.setDescription("Insert the tag name who will link the Blast2GO seqname with the gff feature. "
-					+ "\neg: Here the tagName will be 'seqname', and .thaliana_chr3_prot_1 correspond to the Blast2GO SeqName.\n"
+					+ "\neg: Here the tagName will be 'seqname', and A.thaliana_chr3_prot_1 correspond to the Blast2GO SeqName.\n"
 					+ "A.thalianaCh3	AUGUSTUS	gene	542	1402	.	+	.	seqName=A.thaliana_chr3_prot_1;Name=1")
 			.setMessage("eg: seqName; ID; B2GOname").setValidator(StringValidator.notEmptyString()).build();
 
