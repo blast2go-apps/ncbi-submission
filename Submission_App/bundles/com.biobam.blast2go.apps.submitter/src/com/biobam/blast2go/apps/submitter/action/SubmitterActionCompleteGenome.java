@@ -49,7 +49,7 @@ public class SubmitterActionCompleteGenome extends B2GAction<SubmitterCompleteJo
 	public String getName() {
 		// TODO Auto-generated method stub
 		// return "Submit annotated ";
-		return "Create NCBI GenBank Genome Submission Files";
+		return "Create NCBI GenBank Genome Submission Files (online)";
 	}
 
 	@Override

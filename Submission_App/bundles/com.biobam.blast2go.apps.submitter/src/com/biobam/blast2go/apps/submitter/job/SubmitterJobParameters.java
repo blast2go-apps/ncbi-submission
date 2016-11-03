@@ -312,7 +312,7 @@ public class SubmitterJobParameters extends Parameters {
 	}).setName("Insert the e-value treshold")
 			.setDescription("The e-value treshold this field accepts exponential numbers as '1E-72'.").build();
 	public DoubleKey coverage = DoubleKey.builder(getBaseName(".coverage"), (double) 100)
-			.setName("Insert the coverage treshold").setDescription("The coverage treshold").build();
+			.setName("Insert the HSP hit coverage treshold").setDescription("The coverage treshold").build();
 	public DoubleKey sim = DoubleKey.builder(getBaseName(".sim"), (double) 99).setName("Insert the similarity treshold")
 			.setDescription("The similarity treshold").build();
 

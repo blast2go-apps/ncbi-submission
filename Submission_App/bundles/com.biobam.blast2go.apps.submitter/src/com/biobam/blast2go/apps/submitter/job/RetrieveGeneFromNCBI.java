@@ -47,11 +47,11 @@ public class RetrieveGeneFromNCBI {
 			connection.setRequestMethod("POST");
 			os = connection.getOutputStream();
 			writer = new OutputStreamWriter(os);
-			System.out.println(geneID);
+//			System.out.println(geneID);
 			writer.write("db=protein&id=" + geneID + "&rettype=gb&retmode=xml");
 			writer.flush();
 			final int statusCode = connection.getResponseCode();
-			System.out.println(statusCode);
+//			System.out.println(statusCode);
 			//if (statusCode != 200){
 
 //			success = true;
@@ -91,8 +91,14 @@ public class RetrieveGeneFromNCBI {
 
 			}
 			}
+			if (geneName.isEmpty()) {
+				geneName = "hypothetical protein";
+			}
 			System.out.println(geneName);
-			System.out.println(protName);
+			if (protName.isEmpty()) {
+				protName = "hypothetical protein";
+			}
+//			System.out.println(protName);
 			String GeneProd = geneName + "$" + protName;
 			return GeneProd;
 		} finally {

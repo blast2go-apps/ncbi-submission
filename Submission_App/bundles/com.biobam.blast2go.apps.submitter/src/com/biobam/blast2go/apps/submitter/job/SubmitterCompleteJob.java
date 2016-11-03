@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import com.biobam.blast2go.apps.submitter.job.SubmitterJobParameters.SubType;
 import com.biobam.blast2go.dag.model.GONode;
 import com.biobam.blast2go.dag.model.IGODag;
 import com.biobam.blast2go.namedef.NameDef;
+import com.biobam.blast2go.preferences.proxy.VersionChecker;
 import com.biobam.blast2go.project.model.interfaces.ILightSequence;
 import com.biobam.blast2go.project.model.interfaces.SeqCondImpl;
 import com.biobam.blast2go.workbench.services.IB2GFilesDirectory;
@@ -76,8 +78,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 			// Check for gff files
 			MyJobUtils.existingFilesAndFolders(parameters, monitor);
-
-			if (parameters.subType.getValue().equals(SubType.wgs) && !isCanceled()) {
+			if (parameters.subType.getValue()
+			        .equals(SubType.wgs) && !isCanceled()) {
 				MyJobUtils.cmtParser(parameters, monitor);
 				worked(1);
 
@@ -87,7 +89,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				return;
 			}
 			ReturnIDs geneNumber = tblCreator();
-			postJobMessage("Number of processed sequences: " + geneNumber.getNumberIDsFound().toString());
+			postJobMessage("Number of processed sequences: " + geneNumber.getNumberIDsFound()
+			        .toString());
 			if (isCanceled()) {
 				return;
 			}
@@ -138,29 +141,35 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		IProject project = getInput(SubmitterCompleteJobMetadata.INPUT_PROJECT);
 		Iterator<ILightSequence> iterator = project.onlySelectedSequencesIterator(ItemsOrderList.emptyList());
 		File originFasta = new File(parameters.fastatFile.getValue());
-		String newFasta = parameters.outputDir.getValue() + Path.SEPARATOR
-				+ FileUtils.filenameWithoutExtension(parameters.fastatFile.getValue()) + ".fsa";
+		String newFasta = parameters.outputDir.getValue() + Path.SEPARATOR + FileUtils.filenameWithoutExtension(parameters.fastatFile.getValue()) + ".fsa";
 		File newFastaFile = new File(newFasta);
 		Files.copy(originFasta.toPath(), newFastaFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 		while (iterator.hasNext() && !isCanceled()) {
 			String geneName = "hypothetical protein";
-			String productName = geneName;
+//			String productName = geneName;
 			ILightSequence sequence = iterator.next();
-			if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT, SeqCondImpl.COND_HAS_MAPPING_RESULT,
-					SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
-				Double seqEval = sequence.getBlastOutput().getTopHit().getTopHsp().get(HspKeys.EVALUE);
-				Double seqCov = sequence.getBlastOutput().getTopHit().getHspHitCoverage();
-				Double seqSim = sequence.getBlastOutput().getTopHit().getSimilarity();
+			if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT, SeqCondImpl.COND_HAS_MAPPING_RESULT, SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
+				Double seqEval = sequence.getBlastOutput()
+				        .getTopHit()
+				        .getTopHsp()
+				        .get(HspKeys.EVALUE);
+				Double seqCov = sequence.getBlastOutput()
+				        .getTopHit()
+				        .getHspHitCoverage();
+				Double seqSim = sequence.getBlastOutput()
+				        .getTopHit()
+				        .getSimilarity();
 				double eValue = new BigDecimal(parameters.eVal.getValue()).doubleValue();
 
-				if ((seqEval.compareTo(eValue) <= 0) && (seqCov.compareTo(parameters.coverage.getValue()) >= 0)
-						&& (seqSim.compareTo(parameters.sim.getValue()) >= 0)) {
+				if ((seqEval.compareTo(eValue) <= 0) && (seqCov.compareTo(parameters.coverage.getValue()) >= 0) && (seqSim.compareTo(parameters.sim.getValue()) >= 0)) {
 					// Obtain the geneName from NCBI datbase
-					Object geneID = sequence.getBlastOutput().getTopHit().getGis();
-					System.out.println(geneID);
+					Object geneID = sequence.getBlastOutput()
+					        .getTopHit()
+					        .getGis();
+					//					System.out.println(geneID);
 					String GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
-					System.out.println(GeneProd);
+					//					System.out.println(GeneProd);
 
 					// String[] name = GeneProd.split("\\$");
 					// String ncbiGeneName = name[0];
@@ -171,8 +180,9 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 						// productName = ncbiProdName;
 
 					} else {
-						geneName = getGeneName(
-								sequence.getGoMappings().getGoMappings((sequence.getBlastOutput().getTopHit())));
+						geneName = getGeneName(sequence.getGoMappings()
+						        .getGoMappings((sequence.getBlastOutput()
+						                .getTopHit())));
 					}
 					if (sequence.hasConditions(SeqCondImpl.COND_HAS_MANUAL_ANNOT_RESULT)) {
 						geneName = sequence.getDescription();
@@ -182,8 +192,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = getSequenceAnnotationGos(sequence);
 				List<String> ecCodes = getSequenceEnzymes(sequence);
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds,
-						ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
 				annotations.add(annotation);
 
 			} else if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT)) {
@@ -195,8 +204,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = Collections.emptyList();
 				List<String> ecCodes = Collections.emptyList();
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds,
-						ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
 				annotations.add(annotation);
 			} else {
 				geneName = "hypothetical protein";
@@ -206,8 +214,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = Collections.emptyList();
 				List<String> ecCodes = Collections.emptyList();
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds,
-						ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
 				annotations.add(annotation);
 			}
 			worked(1);
@@ -267,15 +274,23 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					break;
 				case Top_Blast_Hit:
 					String[] names = annotation.geneName.split("\\$");
+					System.out.println(annotation.geneName);
+					System.out.println(Arrays.toString(names));
+					//					System.out.println(names[0]);
+					
 					if (names.length < 2) {
 						geneNAME = names[0];
 						productName = geneNAME;
-					}else{
-					geneNAME = names[0];
-					productName = names[1];
+					} else {
+						geneNAME = names[0];
+						productName = names[1];
 					}
-					if (geneNAME.equals("")){geneNAME = "hypothetical protein";}
-					if (productName.equals("")){productName = "hypothetical protein";}
+					if (geneNAME.equals("")) {
+						geneNAME = "hypothetical protein";
+					}
+					if (productName.equals("")) {
+						productName = "hypothetical protein";
+					}
 					// geneNAME = annotation.geneName;
 
 					break;
@@ -289,20 +304,34 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				// bw.newLine();
 				bw.write(TAB_3 + "gene" + TAB + geneNAME);
 				bw.newLine();
+				///////////////////////////Changed the RNA annotation to the CDS + RNA////////////////INIT
+//				if (gene.isReverseStrand) {
+//					bw.write(gene.mRnaCoordenates.end + TAB + gene.mRnaCoordenates.start + TAB + "mRNA");
+//					bw.newLine();
+//				} else {
+//					bw.write(gene.mRnaCoordenates.start + TAB + gene.mRnaCoordenates.end + TAB + "mRNA");
+//					bw.newLine();
+//				}
 				if (gene.isReverseStrand) {
-					bw.write(gene.mRnaCoordenates.end + TAB + gene.mRnaCoordenates.start + TAB + "mRNA");
-					bw.newLine();
+					for (int i = gene.cdss.size() - 1; i >= 0; i--) {
+						Cds cds = gene.cdss.get(i);
+						bw.write(cds.coordenates.end + TAB + cds.coordenates.start + (i == gene.cdss.size() - 1 ? TAB + "mRNA" : ""));
+						bw.newLine();
+					}
 				} else {
-					bw.write(gene.mRnaCoordenates.start + TAB + gene.mRnaCoordenates.end + TAB + "mRNA");
-					bw.newLine();
+					for (int i = 0; i < gene.cdss.size(); i++) {
+						Cds cds = gene.cdss.get(i);
+						bw.write(cds.coordenates.start + TAB + cds.coordenates.end + (i == 0 ? TAB + "mRNA" : ""));
+						bw.newLine();
+					}
 				}
+				///////////////////////////Changed the RNA annotation to the CDS + RNA////////////////END
 				bw.write(TAB_3 + "product" + TAB + productName);
 				bw.newLine();
 				if (gene.isReverseStrand) {
 					for (int i = gene.cdss.size() - 1; i >= 0; i--) {
 						Cds cds = gene.cdss.get(i);
-						bw.write(cds.coordenates.end + TAB + cds.coordenates.start
-								+ (i == gene.cdss.size() - 1 ? TAB + "CDS" : ""));
+						bw.write(cds.coordenates.end + TAB + cds.coordenates.start + (i == gene.cdss.size() - 1 ? TAB + "CDS" : ""));
 						bw.newLine();
 					}
 				} else {
@@ -316,27 +345,28 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				bw.newLine();
 				bw.write(TAB_3 + "protein_id" + TAB + "gln|" + parameters.labID.getValue() + "|" + locusTag);
 				bw.newLine();
-				bw.write(TAB_3 + "transcript_id" + TAB + "gln|" + parameters.labID.getValue() + "|" + "mrna."
-						+ locusTag);
+				bw.write(TAB_3 + "transcript_id" + TAB + "gln|" + parameters.labID.getValue() + "|" + "mrna." + locusTag);
 				bw.newLine();
 				for (String goId : annotation.goIds) {
 					if (goDag.containsGOId(goId)) {
 						GONode goNode = goDag.getNodeById(goId);
-						bw.write(TAB_3 + "GO_" + getDomain(goNode) + TAB + goNode.getName() + "|"
-								+ goNode.getGoId().substring(3) + "||IEA");
+						bw.write(TAB_3 + "GO_" + getDomain(goNode) + TAB + goNode.getName() + "|" + goNode.getGoId()
+						        .substring(3) + "||IEA");
 						bw.newLine();
 
 					}
 				}
-				for (String ecCode : annotation.ecCodes) {
-					if (StringUtils.countMatches(ecCode, ".") == 3) {
-						bw.write(TAB_3 + "EC_number" + TAB + ecCode.substring(3));
-						bw.newLine();
+				if (!geneNAME.equals("hypothetical protein") || !geneNAME.equals("uncharacterized protein")) {
+					for (String ecCode : annotation.ecCodes) {
+						if (StringUtils.countMatches(ecCode, ".") == 3) {
+							bw.write(TAB_3 + "EC_number" + TAB + ecCode.substring(3));
+							bw.newLine();
 
-					} else if (StringUtils.countMatches(ecCode, ".") == 2) {
-						bw.write(TAB_3 + "EC_number" + TAB + ecCode.substring(3) + ".-");
-						bw.newLine();
+						} else if (StringUtils.countMatches(ecCode, ".") == 2) {
+							bw.write(TAB_3 + "EC_number" + TAB + ecCode.substring(3) + ".-");
+							bw.newLine();
 
+						}
 					}
 				}
 				bw.write(TAB_3 + "note" + TAB + annotation.description.replace("fragment", ""));
@@ -366,7 +396,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			return Collections.emptyList();
 		}
 		@SuppressWarnings("unchecked")
-		Vector<String> annotgos = (Vector<String>) sequence.getAnnotr().get(NameDef.ANNOTRESULT_GOACC);
+		Vector<String> annotgos = (Vector<String>) sequence.getAnnotr()
+		        .get(NameDef.ANNOTRESULT_GOACC);
 		return annotgos;
 	}
 
@@ -375,7 +406,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			return Collections.emptyList();
 		}
 		@SuppressWarnings("unchecked")
-		Vector<String> enzymes = (Vector<String>) sequence.getAnnotr().get(NameDef.ANNOTRESULT_ENZYME_CODE);
+		Vector<String> enzymes = (Vector<String>) sequence.getAnnotr()
+		        .get(NameDef.ANNOTRESULT_ENZYME_CODE);
 		return enzymes;
 	}
 
@@ -389,8 +421,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		return "hypothetical protein";
 	}
 
-	private B2GHtml summary(SubmitterJobParameters parameters, ReturnIDs Ids)
-			throws FileNotFoundException, IOException {
+	private B2GHtml summary(SubmitterJobParameters parameters, ReturnIDs Ids) throws FileNotFoundException, IOException {
 		StringBuilder summaryFile = new StringBuilder();
 		summaryFile.append(parameters.outputDir.getValue() + File.separator + "errorsummary.val");
 		File valFile = new File(summaryFile.toString());
@@ -427,8 +458,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			final String WEBNAME = "$WEBNAME$";
 			while ((line = br.readLine()) != null) {
 				if (line.contains(PROJECT)) {
-					line = line.replace(PROJECT,
-							((IB2GObjectProject) getInput(SubmitterCompleteJobMetadata.INPUT_PROJECT)).getName());
+					line = line.replace(PROJECT, ((IB2GObjectProject) getInput(SubmitterCompleteJobMetadata.INPUT_PROJECT)).getName());
 				}
 				if (line.contains(PATH)) {
 					line = line.replace(PATH, parameters.outputDir.getValue());
@@ -441,18 +471,21 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					java.net.URL entry = bundle.getEntry("/res/ncbi-logo.png");
 
 					String ncbiImg = FileUtils.imageToDataURI(entry);
-					line = line.replace(IMAGE, "\""+ncbiImg+"\"");
+					line = line.replace(IMAGE, "\"" + ncbiImg + "\"");
 				}
 				if (line.contains(ANNOTATED_SEQ)) {
-					line = line.replace(ANNOTATED_SEQ, Ids.getNumberIDsFound().toString());
+					line = line.replace(ANNOTATED_SEQ, Ids.getNumberIDsFound()
+					        .toString());
 				}
 				if (line.contains(NUM_NOT_ANNOTATED)) {
-					line = line.replace(NUM_NOT_ANNOTATED, Integer.toString(Ids.getIDsNotFound().size()));
+					line = line.replace(NUM_NOT_ANNOTATED, Integer.toString(Ids.getIDsNotFound()
+					        .size()));
 				}
 				if (line.contains(URL)) {
 					String url = null;
 					String webName = null;
-					switch (parameters.subType.getValue().getId()) {
+					switch (parameters.subType.getValue()
+					        .getId()) {
 					case "wgs":
 						url = "https://submit.ncbi.nlm.nih.gov/subs/wgs/";
 						webName = "WGS Submission Portal";
@@ -478,7 +511,8 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					for (String id : Ids.getIDsNotFound()) {
 						IDsNotFound.append(id + "<br>");
 					}
-					if (Ids.getIDsNotFound().size() > 0) {
+					if (Ids.getIDsNotFound()
+					        .size() > 0) {
 						errorSummary.append("<p><u>Sequences not processed:</u> <br></p>");
 					}
 					line = line.replace(NOT_ANNOTATED, IDsNotFound);
@@ -490,8 +524,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					line = line.replace(ERRORS, onlyErrors);
 					errorSummary.append(line + "\n");
 				} else {
-					line = line.replace(ERRORS,
-							"<b> ERROR:</b> the .sqn file couldn't be created, please check the error report from the Job and Aplication messages.");
+					line = line.replace(ERRORS, "<b> ERROR:</b> the .sqn file couldn't be created, please check the error report from the Job and Aplication messages.");
 					errorSummary.append(line + "\n");
 				}
 
@@ -529,8 +562,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				List<File> filesList = new ArrayList<File>();
 				FileUtils.handlerDirectory(gffFile, "gff", filesList);
 				for (File fileInDir : filesList) {
-					fsaIdToFileGff.put(FileUtils.filenameWithoutExtension(fileInDir.getAbsolutePath()),
-							fileInDir.getAbsolutePath());
+					fsaIdToFileGff.put(FileUtils.filenameWithoutExtension(fileInDir.getAbsolutePath()), fileInDir.getAbsolutePath());
 				}
 			} else {
 				fsaIdToFileGff.put(FileUtils.filenameWithoutExtension(file), file);

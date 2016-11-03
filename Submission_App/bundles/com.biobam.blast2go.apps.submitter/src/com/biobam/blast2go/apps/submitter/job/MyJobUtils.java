@@ -330,6 +330,8 @@ public class MyJobUtils {
 		}
 	}
 
+	
+	
 	static void tbl2asn(SubmitterJobParameters parameters, String b2gSubmitterExecutable, IB2GProgressMonitor monitor) {
 		monitor.postJobMessage("Validating annotation via tbl2asn (v. 24.9). This may take several minutes.");
 		File fastafile = new File(parameters.fastatFile.getValue());
@@ -390,7 +392,6 @@ public class MyJobUtils {
 						}
 					}).build();
 			try {
-
 				process.execute();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
