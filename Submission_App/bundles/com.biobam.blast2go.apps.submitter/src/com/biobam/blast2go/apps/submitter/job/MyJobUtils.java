@@ -304,7 +304,7 @@ public class MyJobUtils {
 		// Check for gff files
 		// gff unique file
 		StringBuilder sb = new StringBuilder();
-		for (String file : parameters.gff3File.getValue()) {
+		for(String file : parameters.gff3File.getValue()){
 			File gffFile = new File(file);
 			// gff folder
 			if (gffFile.isDirectory()) {
@@ -324,13 +324,68 @@ public class MyJobUtils {
 				sb.append(gffFile.getName() + "\n");
 
 			}
-		}
+		
 		if (sb.length() > 0) {
 			monitor.setFinishMessage("ERROR file(s) not found:\n" + sb.toString());
 		}
 	}
+	}
 
-	
+	static List<String> splitGff(SubmitterJobParameters parameters) throws IOException{
+//		String Path = parameters.gff3File.getValue()
+		List<String> fileNames = new ArrayList<>();
+		for(String filePath : parameters.gff3File.getValue()){
+			
+		
+		File gff = new File(filePath);
+		String path = gff.getParent();
+		BufferedReader br = new BufferedReader(new FileReader(gff));
+		String line = null;
+		String ID = "";
+		List<String> newGffContent = new ArrayList<>();
+		String fileName = "";
+		while ((line = br.readLine()) != null) {
+			if (!line.startsWith("#")) {
+				String[] splitedline = line.split("\t");
+				if (!splitedline[0].equals(ID) || ID.equals("")) {
+					if (newGffContent.size() != 0) {
+						fileName = path +File.separator+ ID + ".gff";
+						fileNames.add(fileName);
+						PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+						writer.println("##gff-version 3");
+						writer.println("# gff generated with Blast2GO");
+						for (String newGffLine : newGffContent) {
+							writer.println(newGffLine);
+
+						}
+						writer.close();
+						newGffContent.clear();
+
+					}
+
+					ID = splitedline[0];
+				}
+				if (splitedline[0].equals(ID)) {
+					newGffContent.add(line);
+
+				}
+			}
+		}
+		fileName = path +File.separator+ ID + ".gff";
+		fileNames.add(fileName);
+		PrintWriter writer = new PrintWriter(fileName, "UTF-8");
+		writer.println("##gff-version 3");
+		writer.println("# gff generated with Blast2GO");
+		for (String newGffLine : newGffContent) {
+			writer.println(newGffLine);
+
+		}
+		writer.close();
+		br.close();
+		}
+		return 	fileNames;
+		
+	}
 	
 	static void tbl2asn(SubmitterJobParameters parameters, String b2gSubmitterExecutable, IB2GProgressMonitor monitor) {
 		monitor.postJobMessage("Validating annotation via tbl2asn (v. 24.9). This may take several minutes.");
@@ -371,7 +426,6 @@ public class MyJobUtils {
 				processBuilder.addParameter("-M", "n");
 			}
 			if ("wgs".equals(parameters.subType.getValue().getId())) {
-//				processBuilder.addParameter("-V", "vbg");
 				processBuilder.addParameter("-V", "vbg");
 				processBuilder.addParameter("-w", "Comment.asm");
 			}

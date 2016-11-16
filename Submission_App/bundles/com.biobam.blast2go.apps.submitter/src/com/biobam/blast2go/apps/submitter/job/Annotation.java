@@ -6,13 +6,15 @@ public class Annotation {
 	public final String name;
 	public final String description;
 	public final String geneName;
+	public final String prodName;
 	public final List<String> goIds;
 	public final List<String> ecCodes;
 
-	public Annotation(String name, String description, String geneName, List<String> goIds, List<String> ecCodes) {
+	public Annotation(String name, String description, String geneName, String prodName, List<String> goIds, List<String> ecCodes) {
 		this.name = name;
 		this.description = description;
 		this.geneName = geneName;
+		this.prodName = prodName;
 		this.goIds = goIds;
 		this.ecCodes = ecCodes;
 	}

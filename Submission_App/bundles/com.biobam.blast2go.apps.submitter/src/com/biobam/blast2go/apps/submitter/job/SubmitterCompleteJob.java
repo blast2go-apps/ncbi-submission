@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,11 +34,11 @@ import com.biobam.blast2go.api.job.B2GJob;
 import com.biobam.blast2go.api.job.IB2GProgressMonitor;
 import com.biobam.blast2go.api.job.input.ItemsOrderList;
 import com.biobam.blast2go.api.utils.FileUtils;
+import com.biobam.blast2go.apps.submitter.job.SubmitterJobParameters.GeneName;
 import com.biobam.blast2go.apps.submitter.job.SubmitterJobParameters.SubType;
 import com.biobam.blast2go.dag.model.GONode;
 import com.biobam.blast2go.dag.model.IGODag;
 import com.biobam.blast2go.namedef.NameDef;
-import com.biobam.blast2go.preferences.proxy.VersionChecker;
 import com.biobam.blast2go.project.model.interfaces.ILightSequence;
 import com.biobam.blast2go.project.model.interfaces.SeqCondImpl;
 import com.biobam.blast2go.workbench.services.IB2GFilesDirectory;
@@ -147,7 +146,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 		while (iterator.hasNext() && !isCanceled()) {
 			String geneName = "hypothetical protein";
-//			String productName = geneName;
+			String prodName = "hypothetical protein";
 			ILightSequence sequence = iterator.next();
 			if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT, SeqCondImpl.COND_HAS_MAPPING_RESULT, SeqCondImpl.COND_HAS_ANNOT_RESULT)) {
 				Double seqEval = sequence.getBlastOutput()
@@ -167,17 +166,23 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					Object geneID = sequence.getBlastOutput()
 					        .getTopHit()
 					        .getGis();
-					//					System.out.println(geneID);
-					String GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
-					//					System.out.println(GeneProd);
 
-					// String[] name = GeneProd.split("\\$");
-					// String ncbiGeneName = name[0];
-					// String ncbiProdName = name[1];
-					if (GeneProd != "" && GeneProd != "hypothetical protein" && GeneProd != "$") {
+					String GeneProd = "";
+					if (parameters.geneName.getValue()
+					        .equals(GeneName.Top_Blast_Hit)) {
+
+						GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
+					}
+
+					String[] name = GeneProd.split("\\$");
+					if (name.length == 2) {
+						String ncbiGeneName = name[0];
+						String ncbiProdName = name[1];
+						geneName = ncbiGeneName;
+						prodName = ncbiProdName;
+
+					} else if (GeneProd != "" && GeneProd != "hypothetical protein" && GeneProd != "$") {
 						geneName = GeneProd;
-						// geneName = ncbiGeneName;
-						// productName = ncbiProdName;
 
 					} else {
 						geneName = getGeneName(sequence.getGoMappings()
@@ -192,7 +197,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = getSequenceAnnotationGos(sequence);
 				List<String> ecCodes = getSequenceEnzymes(sequence);
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, prodName, goIds, ecCodes);
 				annotations.add(annotation);
 
 			} else if (sequence.hasConditions(SeqCondImpl.COND_HAS_BLAST_RESULT)) {
@@ -204,7 +209,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = Collections.emptyList();
 				List<String> ecCodes = Collections.emptyList();
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, prodName, goIds, ecCodes);
 				annotations.add(annotation);
 			} else {
 				geneName = "hypothetical protein";
@@ -214,14 +219,15 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				}
 				List<String> goIds = Collections.emptyList();
 				List<String> ecCodes = Collections.emptyList();
-				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, goIds, ecCodes);
+				Annotation annotation = new Annotation(sequence.getName(), sequence.getDescription(), geneName, prodName, goIds, ecCodes);
 				annotations.add(annotation);
 			}
 			worked(1);
 		}
 
 		IGODag goDag = getInput(SubmitterCompleteJobMetadata.GO_DAG);
-		Map<String, Gene> features = readGff(parameters);
+		List<String> fileNames = MyJobUtils.splitGff(parameters);
+		Map<String, Gene> features = readGff(parameters, fileNames);
 		String fileName = parameters.fastatFile.getValue();
 		File fsaFile = new File(fileName);
 		String fsaName = fsaFile.getName();
@@ -273,22 +279,15 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 					productName = geneNAME;
 					break;
 				case Top_Blast_Hit:
-					String[] names = annotation.geneName.split("\\$");
-					System.out.println(annotation.geneName);
-					System.out.println(Arrays.toString(names));
-					//					System.out.println(names[0]);
-					
-					if (names.length < 2) {
-						geneNAME = names[0];
-						productName = geneNAME;
-					} else {
-						geneNAME = names[0];
-						productName = names[1];
-					}
-					if (geneNAME.equals("")) {
+					//					String[] names = annotation.geneName.split("\\$");
+					//					
+
+					if (!annotation.geneName.equals("") && !annotation.prodName.equals("")) {
+						geneNAME = annotation.geneName.toString();
+						productName = annotation.prodName.toString();
+					} else if (annotation.geneName.equals("")) {
 						geneNAME = "hypothetical protein";
-					}
-					if (productName.equals("")) {
+					} else if (annotation.prodName.equals("")) {
 						productName = "hypothetical protein";
 					}
 					// geneNAME = annotation.geneName;
@@ -305,13 +304,13 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 				bw.write(TAB_3 + "gene" + TAB + geneNAME);
 				bw.newLine();
 				///////////////////////////Changed the RNA annotation to the CDS + RNA////////////////INIT
-//				if (gene.isReverseStrand) {
-//					bw.write(gene.mRnaCoordenates.end + TAB + gene.mRnaCoordenates.start + TAB + "mRNA");
-//					bw.newLine();
-//				} else {
-//					bw.write(gene.mRnaCoordenates.start + TAB + gene.mRnaCoordenates.end + TAB + "mRNA");
-//					bw.newLine();
-//				}
+				//				if (gene.isReverseStrand) {
+				//					bw.write(gene.mRnaCoordenates.end + TAB + gene.mRnaCoordenates.start + TAB + "mRNA");
+				//					bw.newLine();
+				//				} else {
+				//					bw.write(gene.mRnaCoordenates.start + TAB + gene.mRnaCoordenates.end + TAB + "mRNA");
+				//					bw.newLine();
+				//				}
 				if (gene.isReverseStrand) {
 					for (int i = gene.cdss.size() - 1; i >= 0; i--) {
 						Cds cds = gene.cdss.get(i);
@@ -356,7 +355,11 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 					}
 				}
-				if (!geneNAME.equals("hypothetical protein") || !geneNAME.equals("uncharacterized protein")) {
+//				if (geneNAME.equals("hypothetical protein")) {
+//					System.out.println("wololo");
+//				}
+				String hypotheticalProtein = "hypothetical protein";
+				if (!geneNAME.equals(hypotheticalProtein) && !productName.equals("hypothetical protein")  /*&& !productName.equals("uncharacterized protein")*/) {
 					for (String ecCode : annotation.ecCodes) {
 						if (StringUtils.countMatches(ecCode, ".") == 3) {
 							bw.write(TAB_3 + "EC_number" + TAB + ecCode.substring(3));
@@ -387,6 +390,10 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 			}
 
+		}
+		for (String path : fileNames) {
+			File file = new File(path);
+			file.delete();
 		}
 		return new ReturnIDs(missingIds, geneCounter);
 	}
@@ -542,7 +549,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 		//
 		// @Override
 		// public boolean canDo(String arg0) {
-		// // wololo
+		// 
 		// return true;
 		// }
 		// }
@@ -550,18 +557,20 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 	}
 
-	private Map<String, Gene> readGff(SubmitterJobParameters parameters) throws IOException, FileNotFoundException {
+	private Map<String, Gene> readGff(SubmitterJobParameters parameters, List<String> fileNames) throws IOException, FileNotFoundException {
 		Map<String, Gene> features = new HashMap<String, Gene>();
 
 		List<String> fastaIdList = fastaIdFinder(parameters.fastatFile.getValue());
 
 		Map<String, String> fsaIdToFileGff = new HashMap<String, String>();
-		for (String file : parameters.gff3File.getValue()) {
+
+		for (String file : fileNames) {
 			File gffFile = new File(file);
 			if (gffFile.isDirectory()) {
 				List<File> filesList = new ArrayList<File>();
 				FileUtils.handlerDirectory(gffFile, "gff", filesList);
 				for (File fileInDir : filesList) {
+
 					fsaIdToFileGff.put(FileUtils.filenameWithoutExtension(fileInDir.getAbsolutePath()), fileInDir.getAbsolutePath());
 				}
 			} else {

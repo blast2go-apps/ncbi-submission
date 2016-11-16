@@ -22,11 +22,10 @@ public class RetrieveGeneFromNCBI {
 	static String getNames(Object allGeneIDs) throws MalformedURLException, IOException {
 		String geneName = "";
 		String protName = "";
-		// final String HTML =
-		// "http://www.ncbi.nlm.nih.gov/protein?cmd=Retrieve&dopt=GenPept&list_uids=";
-		String[] geneIDs = allGeneIDs.toString().split(",");
-		String geneID = geneIDs[0].replace("[", "").replace("]", "");
-		// =============================
+		String[] geneIDs = allGeneIDs.toString()
+		        .split(",");
+		String geneID = geneIDs[0].replace("[", "")
+		        .replace("]", "");
 
 		URL ncbi_url;
 
@@ -37,68 +36,57 @@ public class RetrieveGeneFromNCBI {
 			OutputStream os = null;
 			OutputStreamWriter writer = null;
 
-//			boolean success = false;
-
 			connection = (HttpURLConnection) ConnectionUtilities.getUrlConnection(ncbi_url);
-			connection.setConnectTimeout(
-					(int) TimeUnit.MILLISECONDS.convert(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS));
+			connection.setConnectTimeout((int) TimeUnit.MILLISECONDS.convert(CONNECTION_TIMEOUT_SECONDS, TimeUnit.SECONDS));
 			connection.setReadTimeout((int) TimeUnit.MILLISECONDS.convert(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS));
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
 			os = connection.getOutputStream();
 			writer = new OutputStreamWriter(os);
-//			System.out.println(geneID);
 			writer.write("db=protein&id=" + geneID + "&rettype=gb&retmode=xml");
 			writer.flush();
-			final int statusCode = connection.getResponseCode();
-//			System.out.println(statusCode);
-			//if (statusCode != 200){
 
-//			success = true;
 			InputStream in = connection.getInputStream();
-//			String decoded = Utilities.convertStreamToString(in);
-//			System.out.println(decoded);
 			os.flush();
 			os.close();
 			// Retrieve the gene name and protein name
 			String line;
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			while ((line = br.readLine()) != null) {
-//
+				//
 				if (line.contains("<GBQualifier_name>gene</GBQualifier_name>")) {
 					line = br.readLine();
 					if (line != null) {
-					Pattern PAT = Pattern.compile("<GBQualifier_value>([^}]*)</GBQualifier_value>");
-					Matcher matcher = PAT.matcher(line);
-					if (matcher.find()) {
-						geneName = matcher.group(1);
+						Pattern PAT = Pattern.compile("<GBQualifier_value>([^}]*)</GBQualifier_value>");
+						Matcher matcher = PAT.matcher(line);
+						if (matcher.find()) {
+							geneName = matcher.group(1);
 
-					}
+						}
 					}
 				}
 				if (line.contains("<GBQualifier_name>product</GBQualifier_name>")) {
-//					"<Prot-ref_name_E>([^}]*)</Prot-ref_name_E>"
+					//					"<Prot-ref_name_E>([^}]*)</Prot-ref_name_E>"
 					line = br.readLine();
 					if (line != null) {
-					Pattern PAT = Pattern.compile("<GBQualifier_value>([^}]*)</GBQualifier_value>");
-					Matcher matcher = PAT.matcher(line);
-					if (matcher.find()) {
-						protName = matcher.group(1);
-					}
+						Pattern PAT = Pattern.compile("<GBQualifier_value>([^}]*)</GBQualifier_value>");
+						Matcher matcher = PAT.matcher(line);
+						if (matcher.find()) {
+							protName = matcher.group(1);
+						}
 					}
 
-				//} else {System.out.println("Error retrieving names from NCBI database; ID doesn't match:" + geneID);}
+					//} else {System.out.println("Error retrieving names from NCBI database; ID doesn't match:" + geneID);}
 
-			}
+				}
 			}
 			if (geneName.isEmpty()) {
 				geneName = "hypothetical protein";
 			}
-			System.out.println(geneName);
+
 			if (protName.isEmpty()) {
 				protName = "hypothetical protein";
 			}
-//			System.out.println(protName);
 			String GeneProd = geneName + "$" + protName;
 			return GeneProd;
 		} finally {
