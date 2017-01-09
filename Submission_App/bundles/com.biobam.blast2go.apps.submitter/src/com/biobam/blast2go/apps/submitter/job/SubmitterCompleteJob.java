@@ -664,7 +664,7 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 			String line;
 			while ((line = br.readLine()) != null) {
 				if (line.contains(">")) {
-					fastaID.add(line.substring(1));
+					fastaID.add(line.substring(1).trim());
 				}
 			}
 		} catch (FileNotFoundException e) {
