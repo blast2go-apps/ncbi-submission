@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,13 +20,20 @@ public class RetrieveGeneFromNCBI {
 	private static final long CONNECTION_TIMEOUT_SECONDS = 10;
 	private static final long READ_TIMEOUT_SECONDS = 15;
 
-	static String getNames(Object allGeneIDs) throws MalformedURLException, IOException {
+	static String getNames(Collection<String> allGeneIDs) throws MalformedURLException, IOException {
+//		String geneID = null;
+		
+		String geneID = allGeneIDs.iterator().next();
+//		for (String string : allGeneIDs) {
+//			geneID = string;
+//			break;
+//		}
 		String geneName = "";
 		String protName = "";
-		String[] geneIDs = allGeneIDs.toString()
-		        .split(",");
-		String geneID = geneIDs[0].replace("[", "")
-		        .replace("]", "");
+//		String[] geneIDs = allGeneIDs.toString()
+//		        .split(",");
+//		String geneID = geneIDs[0].replace("[", "")
+//		        .replace("]", "");
 
 		URL ncbi_url;
 

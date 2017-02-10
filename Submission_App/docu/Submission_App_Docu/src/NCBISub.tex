@@ -54,11 +54,9 @@ Three elements are necessaty to create the submission files:
   names in the fasta description line have to match the GFF file name.
   \item \textbf{Genomic annotation}: This data is provide by the GFF3 files, and
   is also used to link the Blast2GO annotations and the
-  genome reference sequences in the Fasta file. A GFF3 is necessary for each
-  chromosome, with the file name matching the chromosome name as it appears in
-  the fasta file. The sequences name used in the Blast2GO project should appear
-  in the feature column in the GFF3 file. The corresponding feature ID can be
-  specified as parameter (default is seqName).
+  genome reference sequences in the Fasta file. The sequences name used in the 
+  Blast2GO project should appear in the feature column in the GFF3 file. The 
+  corresponding feature ID can be specified as parameter (default is seqName).
   \item \textbf{Functional annotation}: This information is provided by your
   Blast2GO project, and is intended to provide the functional features of your
   sequences, including gene names, Gene Ontology terms and enzyme numbers. The
@@ -69,18 +67,16 @@ Three elements are necessaty to create the submission files:
 \end{itemize}
 
 \subsubsection{Preparing your data}
-
+ 
 In order to integrate all the information and create the NCBI submission
 files, we need to create informative links between them. As discussed above, the
 GFF3 files act as a link between the genome sequence and the functional
 annotation.
 
-The FASTA, or multi-FASTA file may contain one or more chromosomes. The
-chromosome names in the fasta description line have to match the GFF3 name,
-additionally, the sequence name used in the Blast2GO project should appear in
-the feature column in the GFF3 file. The corresponding feature ID can be specified
+The sequence name used in the Blast2GO project should appear in
+the feature column in the GFF3 file (attributes field). The corresponding feature ID can be specified
 as a parameter (for the GFF files created by Augustus and Glimmer included in
-Blast2GO, the IDs correspond to `seqName').
+Blast2GO, the IDs correspond to `seqName' by default).
 
 
 \begin{figure}[!h] \centering

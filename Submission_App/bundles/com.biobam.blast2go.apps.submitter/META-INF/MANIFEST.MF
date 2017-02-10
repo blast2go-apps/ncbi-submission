@@ -19,7 +19,8 @@ Require-Bundle: com.biobam.blast2go.api;bundle-version="1.0.0",
  com.biobam.blast2go.project.model.interfaces;bundle-version="1.0.0",
  com.biobam.blast2go.api.datatype.typed;bundle-version="1.0.0",
  com.biobam.blast2go.namedef;bundle-version="1.0.0",
- com.biobam.blast2go.basic_utilities;bundle-version="1.0.1"
+ com.biobam.blast2go.basic_utilities;bundle-version="1.0.1",
+ lib.guava;bundle-version="18.0.0"
 Bundle-ClassPath: commons-lang3-3.4-javadoc.jar,
  commons-lang3-3.4.jar,
  .

@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -163,15 +164,16 @@ public class SubmitterCompleteJob extends B2GJob<SubmitterJobParameters> {
 
 				if ((seqEval.compareTo(eValue) <= 0) && (seqCov.compareTo(parameters.coverage.getValue()) >= 0) && (seqSim.compareTo(parameters.sim.getValue()) >= 0)) {
 					// Obtain the geneName from NCBI datbase
-					Object geneID = sequence.getBlastOutput()
-					        .getTopHit()
-					        .getGis();
+					Collection<String> geneIDs = sequence.getBlastOutput().getTopHit().getAcs().values();
+//							sequence.getBlastOutput()
+//					        .getTopHit()
+//					        .getGis();
 
 					String GeneProd = "";
 					if (parameters.geneName.getValue()
 					        .equals(GeneName.Top_Blast_Hit)) {
 
-						GeneProd = RetrieveGeneFromNCBI.getNames(geneID);
+						GeneProd = RetrieveGeneFromNCBI.getNames(geneIDs);
 					}
 
 					String[] name = GeneProd.split("\\$");
